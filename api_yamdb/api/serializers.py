@@ -1,127 +1,134 @@
-from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
-from reviews.models import Category, Comment, Genre, Title, Review
-
-User = get_user_model()
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
-class EmailSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())])
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role')
+
+
+class NotAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role')
+        read_only_fields = ('role',)
+
+
+class GetTokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())])
+        required=True)
+    confirmation_code = serializers.CharField(
+        required=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'confirmation_code'
+        )
+
+
+class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
         fields = ('email', 'username')
 
-    def validate_username(self, value):
-        user = value
-        if user == 'me':
-            raise serializers.ValidationError(
-                'Недопустимое имя'
-            )
-        return value
-
-
-class ConfirmationSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    confirmation_code = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = ('username', 'confirmation_code')
-
-
-class UserForAdminSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = (
-            'first_name',
-            'last_name',
-            'username',
-            'bio',
-            'email',
-            'role',
-        )
-        model = User
-
-
-class UserSerializer(UserForAdminSerializer):
-    role = serializers.CharField(read_only=True)
-
 
 class CategorySerializer(serializers.ModelSerializer):
+
     class Meta:
+        exclude = ('id', )
         model = Category
-        exclude = ['id']
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
-    )
-
-    class Meta:
-        model = Comment
-        exclude = ['review']
+        lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
+
     class Meta:
+        exclude = ('id', )
         model = Genre
-        exclude = ['id']
+        lookup_field = 'slug'
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class TitleReadSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
-    genre = GenreSerializer(many=True, read_only=True)
-    rating = serializers.FloatField(max_value=10, min_value=1)
+    genre = GenreSerializer(
+        read_only=True,
+        many=True
+    )
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        model = Title
         fields = '__all__'
+        model = Title
 
 
-class TitleSerializerCreateUpdate(serializers.ModelSerializer):
+class TitleWriteSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Category.objects.all(), required=False)
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
     genre = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Genre.objects.all(), many=True,
-        required=False)
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True
+    )
 
     class Meta:
-        model = Title
         fields = '__all__'
-
-
-class GetContextTitle():
-    requires_context = True
-
-    def __call__(self, serializer_field):
-        return serializer_field.context.get('view').kwargs.get('title_id')
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
+    title = serializers.SlugRelatedField(
+        slug_field='name',
+        read_only=True
     )
-    title = serializers.HiddenField(default=GetContextTitle())
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    def validate_score(self, value):
+        if 0 > value > 10:
+            raise serializers.ValidationError('Оценка по 10-бальной шкале!')
+        return value
+
+    def validate(self, data):
+        request = self.context['request']
+        author = request.user
+        title_id = self.context.get('view').kwargs.get('title_id')
+        title = get_object_or_404(Title, pk=title_id)
+        if (
+            request.method == 'POST'
+            and Review.objects.filter(title=title, author=author).exists()
+        ):
+            raise ValidationError('Может существовать только один отзыв!')
+        return data
 
     class Meta:
-        model = Review
         fields = '__all__'
+        model = Review
 
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('author', 'title'),
-                message='UniqueTogetherMessage'
-            )
-        ]
+
+class CommentSerializer(serializers.ModelSerializer):
+    review = serializers.SlugRelatedField(
+        slug_field='text',
+        read_only=True
+    )
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comment

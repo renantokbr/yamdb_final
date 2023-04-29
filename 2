@@ -1,0 +1,71 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.6, pytest-7.3.1, pluggy-1.0.0 -- /usr/bin/python3
+rootdir: /mnt/c/dev/yamdb_final
+configfile: pytest.ini
+testpaths: tests/
+collecting ... collected 4 items / 2 errors
+
+==================================== ERRORS ====================================
+_________________ ERROR collecting tests/test_requirements.py __________________
+ImportError while importing test module '/mnt/c/dev/yamdb_final/tests/test_requirements.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.10/dist-packages/_pytest/python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+/usr/local/lib/python3.10/dist-packages/_pytest/pathlib.py:564: in import_path
+    importlib.import_module(module_name)
+/usr/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+/usr/local/lib/python3.10/dist-packages/_pytest/assertion/rewrite.py:172: in exec_module
+    exec(co, module.__dict__)
+tests/test_requirements.py:3: in <module>
+    from django.conf import settings
+E   ModuleNotFoundError: No module named 'django'
+___________________ ERROR collecting tests/test_settings.py ____________________
+ImportError while importing test module '/mnt/c/dev/yamdb_final/tests/test_settings.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/lib/python3.10/dist-packages/_pytest/python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+/usr/local/lib/python3.10/dist-packages/_pytest/pathlib.py:564: in import_path
+    importlib.import_module(module_name)
+/usr/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+/usr/local/lib/python3.10/dist-packages/_pytest/assertion/rewrite.py:172: in exec_module
+    exec(co, module.__dict__)
+tests/test_settings.py:1: in <module>
+    from api_yamdb import settings
+E   ImportError: cannot import name 'settings' from 'api_yamdb' (unknown location)
+=============================== warnings summary ===============================
+../../../../usr/local/lib/python3.10/dist-packages/_pytest/config/__init__.py:1302
+  /usr/local/lib/python3.10/dist-packages/_pytest/config/__init__.py:1302: PytestConfigWarning: Unknown config option: DJANGO_SETTINGS_MODULE
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+../../../../usr/local/lib/python3.10/dist-packages/_pytest/config/__init__.py:1302
+  /usr/local/lib/python3.10/dist-packages/_pytest/config/__init__.py:1302: PytestConfigWarning: Unknown config option: python_paths
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_requirements.py
+ERROR tests/test_settings.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
+======================== 2 warnings, 2 errors in 0.66s =========================
