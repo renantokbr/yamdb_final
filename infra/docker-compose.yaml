@@ -1,16 +1,16 @@
 version: '3.8'
 
 volumes:
+  db_value:
   static_value:
   media_value:
-  database:
 
 services:
 
   db:
     image: postgres:13.0-alpine
     volumes:
-      - database:/var/lib/postgresql/data/
+      - db_value:/var/lib/postgresql/data/
     env_file:
       - ./.env
   web:
