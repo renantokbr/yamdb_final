@@ -2,17 +2,20 @@
 ![Yamdb Workflow Status](https://github.com/renantokbr/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg?branch=master&event=push)
 
 Стек:
-- Django 4.1.1
-- DRF 3.14.0
-- djangorestframework-simplejwt 5.2.1
-- psycopg2-binary 2.9.3
-- PyJWT 2.5.0
+- Django 2.2.16
+- DRF 3.12.4
+- djangorestframework-simplejwt 4.8.0
+- psycopg2-binary 2.8.6
+- PyJWT 2.1.0
 
-### Предварительно установим Docker на ПК под управлением Linux (Ubuntu 22.10), для Windows немного иная установка, тут не рассматриваем:
+## Предварительно установим Docker на ПК под управлением Linux (Ubuntu 22.10):
 ```bash
-sudo apt update && apt upgrade -y
+sudo apt update  apt upgrade -y
 ```
-### Удаляем старый Docker:
+```bash
+sudo apt upgrade -y
+```
+## Удаляем старый Docker:
 ```bash
 sudo apt remove docker
 ```
@@ -21,7 +24,7 @@ sudo apt remove docker
 ```bash
 sudo apt install docker.io
 ```
-### Смотрим версию Docker (должно выдать Docker version 20.10.16, build 20.10.16-0ubuntu1):
+### Смотрим версию Docker:
 ```bash
 docker --version
 ```
