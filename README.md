@@ -1,6 +1,8 @@
 
 ![Yamdb Workflow Status](https://github.com/renantokbr/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg?branch=master&event=push)
 
+http://84.201.161.131/redoc/
+
 Стек:
 - Django 2.2.16
 - DRF 3.12.4
